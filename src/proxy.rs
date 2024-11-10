@@ -11,7 +11,8 @@ pub async fn handle_request(
     mut inc_request: Request<Incoming>,
     client_addr: SocketAddr,
 ) -> Result<Response<Incoming>, BoxError> {
-    let stream = TcpStream::connect(format!("127.0.0.1:{}", config().proxy.dest_port)).await?;
+    let destination = config().proxy.destination.clone();
+    let stream = TcpStream::connect(destination).await?;
     let io = TokioIo::new(stream);
     let addr = client_addr.clone();
 

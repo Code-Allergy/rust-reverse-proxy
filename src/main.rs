@@ -3,6 +3,8 @@ mod headers;
 mod proxy;
 mod server;
 mod cli;
+mod tls;
+mod balancer;
 
 use std::sync::Once;
 use config::Config;

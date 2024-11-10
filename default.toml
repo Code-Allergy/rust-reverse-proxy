@@ -1,3 +1,27 @@
 [proxy]
-host_port = 8080
-dest_port = 3000
+http_host = 8080
+https_host = 8443
+destination = "127.0.0.1:3000"
+
+[tls]
+enabled = true
+cert = "server.crt"
+key = "server.key"
+
+[balancer]
+enabled = true
+strategy = "round-robin"
+hosts = [
+    "127.0.0.1:3000",
+    "127.0.0.1:3001",
+    "127.0.0.1:3002",
+    "127.0.0.1:3003"
+]
+
+
+
+[reroute]
+enabled = true
+paths = [
+    { from = "/api", to = "/service/api" }
+]

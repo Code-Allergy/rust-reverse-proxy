@@ -1,6 +1,8 @@
 use std::cell::OnceCell;
 use std::{fs, process};
-use std::path::Path;
+use std::collections::HashMap;
+use std::iter::Map;
+use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 use clap::Parser;
 use once_cell::sync::Lazy;
@@ -12,22 +14,77 @@ use crate::cli::Args;
 
 #[derive(Deserialize, Default)]
 pub struct Config {
-    pub proxy: ProxyConfig
+    pub proxy: ProxyConfig,
+    pub tls: TlsConfig,
+    pub balancer: BalancerConfig,
+    // pub reroute: RerouteConfig,
 }
 #[derive(Deserialize)]
 pub struct ProxyConfig {
-    pub host_port: u16,
-    pub dest_port: u16
+    pub http_host: u16,
+    pub https_host: u16,
+    pub destination: String
 }
+
+#[derive(Deserialize)]
+pub struct TlsConfig {
+    pub enabled: bool,
+    pub cert_path: Option<PathBuf>,
+    pub key_path: Option<PathBuf>,
+}
+
+#[derive(Deserialize)]
+pub struct BalancerConfig {
+    pub enabled: bool,
+    pub strategy: String,
+    pub hosts: Vec<String>,
+}
+
+// #[derive(Deserialize)]
+// pub struct RerouteConfig {
+//     pub enabled: bool,
+//     pub paths: HashMap<String, String>
+// }
+
 
 impl Default for ProxyConfig {
     fn default() -> Self {
         ProxyConfig {
-            host_port: 8080,
-            dest_port: 3000,
+            http_host: 8080,
+            https_host: 8443,
+            destination: "127.0.0.1:3000".into(),
         }
     }
 }
+
+impl Default for TlsConfig {
+    fn default() -> Self {
+        TlsConfig {
+            enabled: false,
+            cert_path: None,
+            key_path: None,
+        }
+    }
+}
+
+impl Default for BalancerConfig {
+    fn default() -> Self {
+        BalancerConfig {
+            enabled: false,
+            strategy: "round-robin".into(),
+            hosts: vec![]
+        }
+    }
+}
+
+// impl Default for RerouteConfig {
+//     fn default() -> Self {
+//         RerouteConfig {
+//             enabled: false,
+//             paths: HashMap::new()
+//         }
+//     }
+// }
 
 
 // Create a global static CONFIG, initially uninitialized
