@@ -1,7 +1,6 @@
 use std::convert::Infallible;
 use std::fs::File;
 use std::io::BufReader;
-use std::net::SocketAddr;
 use std::sync::Arc;
 use bytes::Bytes;
 use http_body_util::combinators::BoxBody;
@@ -13,9 +12,9 @@ use rustls_pemfile::{certs, private_key};
 use tokio_rustls::TlsAcceptor;
 use crate::config::config;
 
-pub fn init_tls() -> TlsAcceptor {
-    let cert_file = File::open(config().tls.cert_path.clone().unwrap())?;
-    let key_file = File::open(config().tls.key_path.clone().unwrap())?;
+pub fn init_tls() -> Result<TlsAcceptor, Box<dyn std::error::Error>> {
+    let cert_file = File::open(config().tls.cert.clone().unwrap())?;
+    let key_file = File::open(config().tls.key.clone().unwrap())?;
     let cert_reader = &mut BufReader::new(cert_file);
     let key_reader = &mut BufReader::new(key_file);
 
@@ -31,11 +30,11 @@ pub fn init_tls() -> TlsAcceptor {
         .with_no_client_auth()
         .with_single_cert(certs, key)?;
 
-    return TlsAcceptor::from(Arc::new(tls_cfg));
+    Ok(TlsAcceptor::from(Arc::new(tls_cfg)))
 }
 
 // Handle HTTP to HTTPS redirect
-pub async fn redirect_to_https(req: Request<hyper::body::Incoming>, client_addr: SocketAddr) -> Result<Response<BoxBody<Bytes, hyper::Error>>, hyper::Error> {
+pub async fn redirect_to_https(req: Request<hyper::body::Incoming>) -> Result<Response<BoxBody<Bytes, hyper::Error>>, hyper::Error> {
     let host = req.headers()
         .get("host")
         .and_then(|h| h.to_str().ok())

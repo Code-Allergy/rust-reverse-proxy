@@ -1,9 +1,8 @@
 use std::net::SocketAddr;
 use hyper::header::HeaderValue;
 use hyper::HeaderMap;
-use crate::config::config;
 
-pub fn add_forwarded_headers(headers: &mut HeaderMap, client_addr: SocketAddr) {
+pub fn add_forwarded_headers(headers: &mut HeaderMap, client_addr: SocketAddr, destination: &str) {
     if let Some(existing) = headers.get("X-Forwarded-For") {
         let mut new_value = existing.to_str().unwrap().to_string();
         new_value.push_str(&format!(", {}", client_addr.ip().to_string()));
@@ -30,7 +29,7 @@ pub fn add_forwarded_headers(headers: &mut HeaderMap, client_addr: SocketAddr) {
 
     // modify host header
     if headers.contains_key("Host") {
-        let new_value = &format!("{}", config().proxy.destination);
+        let new_value = &format!("{}", destination);
         headers.insert("Host", HeaderValue::from_str(&new_value).unwrap());
     }
 

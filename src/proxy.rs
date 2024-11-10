@@ -4,6 +4,7 @@ use hyper_util::rt::TokioIo;
 use tokio::net::TcpStream;
 use crate::{headers, config::CONFIG};
 use std::net::SocketAddr;
+use crate::balancer::get_destination;
 use crate::config::config;
 
 type BoxError = Box<dyn std::error::Error + Send + Sync>;
@@ -11,8 +12,8 @@ pub async fn handle_request(
     mut inc_request: Request<Incoming>,
     client_addr: SocketAddr,
 ) -> Result<Response<Incoming>, BoxError> {
-    let destination = config().proxy.destination.clone();
-    let stream = TcpStream::connect(destination).await?;
+    let destination = get_destination().await;
+    let stream = TcpStream::connect(&destination).await?;
     let io = TokioIo::new(stream);
     let addr = client_addr.clone();
 
@@ -27,7 +28,7 @@ pub async fn handle_request(
     });
 
     // Add headers
-    headers::add_forwarded_headers(inc_request.headers_mut(), addr);
+    headers::add_forwarded_headers(inc_request.headers_mut(), addr, &destination);
 
     // Forward request
     let res = sender.send_request(inc_request).await?;

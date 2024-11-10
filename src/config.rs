@@ -29,8 +29,8 @@ pub struct ProxyConfig {
 #[derive(Deserialize)]
 pub struct TlsConfig {
     pub enabled: bool,
-    pub cert_path: Option<PathBuf>,
-    pub key_path: Option<PathBuf>,
+    pub cert: Option<PathBuf>,
+    pub key: Option<PathBuf>,
 }
 
 #[derive(Deserialize)]
@@ -61,8 +61,8 @@ impl Default for TlsConfig {
     fn default() -> Self {
         TlsConfig {
             enabled: false,
-            cert_path: None,
-            key_path: None,
+            cert: None,
+            key: None,
         }
     }
 }
