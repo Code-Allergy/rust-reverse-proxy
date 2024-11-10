@@ -17,7 +17,7 @@ pub struct Config {
     pub proxy: ProxyConfig,
     pub tls: TlsConfig,
     pub balancer: BalancerConfig,
-    // pub reroute: RerouteConfig,
+    pub reroute: RerouteConfig,
 }
 #[derive(Deserialize)]
 pub struct ProxyConfig {
@@ -40,11 +40,19 @@ pub struct BalancerConfig {
     pub hosts: Vec<String>,
 }
 
-// #[derive(Deserialize)]
-// pub struct RerouteConfig {
-//     pub enabled: bool,
-//     pub paths: HashMap<String, String>
-// }
+#[derive(Deserialize)]
+pub struct RerouteConfig {
+    pub enabled: bool,
+    // TODO map from path to destination
+    pub paths: Vec<PathMapping>
+}
+
+#[derive(Deserialize, Debug)]
+pub struct PathMapping {
+    pub(crate) from: String,
+    pub(crate) to: String,
+    pub description: Option<String>, // You can store an optional description
+}
 
 
 impl Default for ProxyConfig {
@@ -77,14 +85,14 @@ impl Default for BalancerConfig {
     }
 }
 
-// impl Default for RerouteConfig {
-//     fn default() -> Self {
-//         RerouteConfig {
-//             enabled: false,
-//             paths: HashMap::new()
-//         }
-//     }
-// }
+impl Default for RerouteConfig {
+    fn default() -> Self {
+        RerouteConfig {
+            enabled: false,
+            paths: vec![]
+        }
+    }
+}
 
 
 // Create a global static CONFIG, initially uninitialized

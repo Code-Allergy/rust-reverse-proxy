@@ -5,6 +5,7 @@ mod server;
 mod cli;
 mod tls;
 mod balancer;
+mod reroute;
 
 use std::sync::Once;
 use config::Config;
