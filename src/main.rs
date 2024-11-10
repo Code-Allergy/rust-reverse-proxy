@@ -18,7 +18,10 @@ static INIT: Once = Once::new();
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    pretty_env_logger::init();
+    pretty_env_logger::formatted_builder()
+        .filter(None, log::LevelFilter::Info)
+        .init();
+
     initialize_config().expect("Failed to load config.");
 
     if let Err(err) = server::run_server().await {
