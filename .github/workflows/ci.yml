@@ -1,10 +1,9 @@
 name: Rust CI
 
 on:
-  push:
-    branches: [ "main" ]
+  push: # Trigger on pushes to any branch
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main" ] # Explicitly keep PRs targeting main
 
 env:
   CARGO_TERM_COLOR: always
