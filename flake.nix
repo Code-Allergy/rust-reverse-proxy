@@ -14,20 +14,24 @@
         pkgs = import nixpkgs {
           inherit system overlays;
         };
+        # Define the desired Rust nightly toolchain with rust-src once
+        rustNightlyWithSrc = pkgs.rust-bin.selectLatestNightlyWith (toolchain:
+          toolchain.default.override {
+            extensions = [ "rust-src" ];
+          }
+        );
       in
       with pkgs;
       {
         devShells.default = mkShell {
           buildInputs = [
-            (rust-bin.selectLatestNightlyWith (toolchain: toolchain.default.override {
-              extensions = [ "rust-src" ]; # for rust-analyzer
-            }))
-            cargo-watch # Optional: for development convenience
+            rustNightlyWithSrc # Use the defined toolchain
+            cargo-watch 
             # Add other development tools here if needed
           ];
 
-          # Environment variables
-          RUST_SRC_PATH = rust-bin.selectLatestNightlyWith (toolchain: toolchain.rustLibSrc);
+          # Attempt to access rustLibSrc from the overridden toolchain
+          RUST_SRC_PATH = rustNightlyWithSrc.rustLibSrc;
         };
       }
     );
