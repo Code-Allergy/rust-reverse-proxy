@@ -22,7 +22,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .filter(None, log::LevelFilter::Info)
         .init();
 
-    initialize_config().expect("Failed to load config.");
+    if let Err(e) = initialize_config() {
+        log::error!("Failed to initialize configuration: {}", e);
+        std::process::exit(1);
+    }
 
     if let Err(err) = server::run_server().await {
         log::error!("Server error: {:?}", err);
