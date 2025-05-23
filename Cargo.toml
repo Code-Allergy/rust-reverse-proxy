@@ -1,3 +1,10 @@
+[workspace]
+resolver = "2" 
+members = [
+    ".", 
+    "integration_test_backend"
+]
+
 [package]
 name = "reverse_proxy"
 version = "0.1.0"
@@ -22,3 +29,9 @@ rustls-pemfile = "2.2.0"
 
 [dev-dependencies]
 uuid = { version = "1.10.0", features = ["v4"] }
+reqwest = { version = "0.11.18", default-features = false, features = ["json", "blocking", "rustls-tls"] } # Further Downgraded reqwest
+tokio = { version = "1.41.1", features = ["macros", "rt-multi-thread", "fs"] } # Align with main
+once_cell = "1.20.2" # Align with main
+portpicker = "0.1.1"
+toml = "0.8.19" # Already in main [dependencies]
+lazy_static = "1.5.0" # Already in main [dependencies]
